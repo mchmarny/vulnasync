@@ -1,4 +1,4 @@
-# s3cme
+# vulnasync
 
 Sample Go app repo with test and release pipelines optimized for software supply chain security (S3C). Includes Terraform setup for Artifact Registry on GCP with [OpenID Connect](https://openid.net/connect/) (OIDC), so no need for service account keys or GitHub secrets. 
 
@@ -107,7 +107,7 @@ https://console.cloud.google.com/artifacts/docker/$PROJECT_ID/$REGION
 
 The image is the line item tagged with version (e.g. `v0.4.0`). The other two OCI artifacts named with the image digest in the registry are signature (`.sig`) and attestation (`.att`).
 
-You can now take the image digest and query sigstore transparency service (Rekor). Easiest way to do that is to use the Chainguard's [rekor-search-ui](https://github.com/chainguard-dev/rekor-search-ui). Here is the entry for [s3cme v0.4.4](https://rekor.tlog.dev/?hash=sha256:0e07d5c7ec2caaf2643c0e3604687b5a826c4e5a51bc8a26d99edb0979380d7d).
+You can now take the image digest and query sigstore transparency service (Rekor). Easiest way to do that is to use the Chainguard's [rekor-search-ui](https://github.com/chainguard-dev/rekor-search-ui). Here is the entry for [vulnasync v0.4.4](https://rekor.tlog.dev/?hash=sha256:0e07d5c7ec2caaf2643c0e3604687b5a826c4e5a51bc8a26d99edb0979380d7d).
 
 ## Provenance Verification  
 
@@ -138,7 +138,7 @@ Certificate issuer URL:  https://token.actions.githubusercontent.com
 GitHub Workflow Trigger: push
 GitHub Workflow SHA: 654000662f166b4621ba7dd705568b9a743b6d45
 GitHub Workflow Name: on_tag
-GitHub Workflow Trigger mchmarny/s3cme
+GitHub Workflow Trigger mchmarny/vulnasync
 GitHub Workflow Ref: refs/tags/v0.6.21
 ```
 
@@ -170,7 +170,7 @@ Returns:
     "predicateType": "https://slsa.dev/provenance/v0.2",
     "subject": [
         {
-            "name": "us-west1-docker.pkg.dev/cloudy-s3c/s3cme/s3cme",
+            "name": "us-west1-docker.pkg.dev/cloudy-s3c/vulnasync/vulnasync",
             "digest": {
                 "sha256": "22080f8082e60e7f3ab745818e59c6f513464de23b53bbd28dc83c4936c27cbc"
             }
@@ -198,7 +198,7 @@ Next, check the subject portion of the issuer identity (in this case, the SLSA w
 ```yaml
 identities:
 - issuer: https://token.actions.githubusercontent.com
-subjectRegExp: "^https://github.com/mchmarny/s3cme/.github/workflows/slsa.yaml@refs/tags/v[0-9]+.[0-9]+.[0-9]+$"
+subjectRegExp: "^https://github.com/mchmarny/vulnasync/.github/workflows/slsa.yaml@refs/tags/v[0-9]+.[0-9]+.[0-9]+$"
 ```
 
 Finally, the policy data that checks for `predicateType` on the image should include the content of the same policy ([policy/provenance.cue](policy/provenance.cue)) we've used during the SLSA verification using image release and in the above manual verification process. 
@@ -239,10 +239,10 @@ validation failed: no matching policies: spec.containers[0].image
 index.docker.io/nginxdemos/hello@sha256:409564c3a1d1...
 ```
 
-That policy failed because the image URI doesn't match the images glob we've specified (`glob: us-west1-docker.pkg.dev/cloudy-s3c/s3cme/**`). How about if we try to deploy image that does:
+That policy failed because the image URI doesn't match the images glob we've specified (`glob: us-west1-docker.pkg.dev/cloudy-s3c/vulnasync/**`). How about if we try to deploy image that does:
 
 ```shell
-kubectl run test -n demo --image us-west1-docker.pkg.dev/cloudy-s3c/s3cme/s3cme@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d
+kubectl run test -n demo --image us-west1-docker.pkg.dev/cloudy-s3c/vulnasync/vulnasync@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d
 ```
 
 Now the failure is on the SLSA policy due to lack of verifiable attestations:
@@ -250,8 +250,8 @@ Now the failure is on the SLSA policy due to lack of verifiable attestations:
 ```shell
 admission webhook "policy.sigstore.dev" denied the request:
 validation failed: failed policy: slsa-attestation-image-policy: spec.containers[0].image
-us-west1-docker.pkg.dev/cloudy-s3c/s3cme/s3cme@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d 
-attestation keyless validation failed for authority authority-0 for us-west1-docker.pkg.dev/cloudy-s3c/s3cme/s3cme@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d: 
+us-west1-docker.pkg.dev/cloudy-s3c/vulnasync/vulnasync@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d 
+attestation keyless validation failed for authority authority-0 for us-west1-docker.pkg.dev/cloudy-s3c/vulnasync/vulnasync@sha256:ead1a5b3e83760e304ee449732feaa4a80c76c2c098dccb56e3d3b8926b5509d: 
 no matching attestations:
 ```
 
@@ -259,7 +259,7 @@ This demonstrates how the policy-controller admission controller enforces [SLSA 
 
 ## Deployment 
 
-Automation to bootstrap `s3cme` as a fully functional, multi-region, deployment on GCP are located in [deploy/README.md](deploy/README.md).
+Automation to bootstrap `vulnasync` as a fully functional, multi-region, deployment on GCP are located in [deploy/README.md](deploy/README.md).
 
 ## Disclaimer
 

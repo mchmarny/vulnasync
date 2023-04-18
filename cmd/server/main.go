@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	server "github.com/mchmarny/s3cme/cmd/server/v1"
+	server "github.com/mchmarny/vulnasync/cmd/server/v1"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
