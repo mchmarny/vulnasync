@@ -1,6 +1,6 @@
 # deploy
 
-This deployment bootstraps a fully functional, multi-region, deployment of `s3cme` on GCP containing:
+This deployment bootstraps a fully functional, multi-region, deployment of `vulnasync` on GCP containing:
 
 **Cloud Run** 
 
@@ -36,7 +36,7 @@ This deployment will prompt for a lot of variables, you can create `variables.tf
 
 ```txt
 project_id     = "your-project-id"
-name           = "s3cme"
+name           = "vulnasync"
 domain         = "your.domain.dev"
 regions        = ["us-west1", "europe-west1", "asia-east1"]
 image          = "restme"

@@ -8,7 +8,7 @@ variable "project_id" {
 
 variable "name" {
   description = "Base name to derive everythign else from"
-  default     = "s3cme"
+  default     = "vulnasync"
   type        = string
   nullable    = false
 }
@@ -22,7 +22,7 @@ variable "location" {
 
 variable "git_repo" {
   description = "GitHub Repo"
-  default     = "mchmarny/s3cme"
+  default     = "mchmarny/vulnasync"
   type        = string
   nullable    = false
 }

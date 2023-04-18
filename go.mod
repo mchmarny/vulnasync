@@ -1,4 +1,4 @@
-module github.com/mchmarny/s3cme
+module github.com/mchmarny/vulnasync
 
 go 1.20
 

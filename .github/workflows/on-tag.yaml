@@ -12,10 +12,10 @@ jobs:
   conf:
     env:
       # Update these based on the Setup output
-      IMG_NAME: s3cme
-      PROVIDER_ID: projects/510441318314/locations/global/workloadIdentityPools/s3cme-github-pool/providers/github-provider
-      REG_URI: us-west1-docker.pkg.dev/cloudy-s3c/s3cme
-      SA_EMAIL: s3cme-github-actions-user@cloudy-s3c.iam.gserviceaccount.com
+      IMG_NAME: vulnasync
+      PROVIDER_ID: projects/865303606864/locations/global/workloadIdentityPools/vulnasync-github-pool/providers/github-provider
+      REG_URI: us-west1-docker.pkg.dev/cloudy-labz/vulnasync
+      SA_EMAIL: vulnasync-github-actions-user@cloudy-labz.iam.gserviceaccount.com
 
       # Defaults
       BUILDER_VERSION: v1.4.0
