@@ -100,5 +100,5 @@ jobs:
         COSIGN_EXPERIMENTAL: "true"
       run: |
         set -euo pipefail
-        ko build cmd/server/main.go --image-refs .digest --bare --tags ${{ env.RELEASE_VERSION }}
+        ko build main.go --image-refs .digest --bare --tags ${{ env.RELEASE_VERSION }}
         echo "digest=$(cat .digest)" >> "$GITHUB_OUTPUT"

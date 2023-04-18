@@ -45,7 +45,7 @@ build: tidy ## Builds CLI binary
 	CGO_ENABLED=0 go build -trimpath \
 	-ldflags="-w -s -X main.version=$(RELEASE_VERSION) \
 	-extldflags '-static'" -mod vendor \
-	-o bin/server cmd/server/main.go
+	-o bin/server main.go
 
 .PHONY: vulncheck
 vulncheck: ## Checks for soource vulnerabilities
@@ -53,7 +53,7 @@ vulncheck: ## Checks for soource vulnerabilities
 
 .PHONY: server
 server: ## Runs uncompiled app 
-	LOG_LEVEL=debug go run cmd/server/main.go
+	LOG_LEVEL=debug go run main.go
 
 .PHONY: tag
 tag: ## Creates release tag 
