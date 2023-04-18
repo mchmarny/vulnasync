@@ -1,0 +1,92 @@
+finding:
+  canonicalName: projects/865303606864/sources/5355249297771256540/findings/cd2a095d6989c31d9088727043d5257d
+  category: OPEN_RDP_PORT
+  compliances:
+  - ids:
+    - '3.7'
+    standard: cis
+    version: '1.0'
+  - ids:
+    - '3.7'
+    standard: cis
+    version: '1.1'
+  - ids:
+    - '3.7'
+    standard: cis
+    version: '1.2'
+  - ids:
+    - '3.7'
+    standard: cis
+    version: '1.3'
+  - ids:
+    - 1.2.1
+    standard: pci
+  - ids:
+    - SC-7
+    standard: nist
+  - ids:
+    - A.13.1.1
+    standard: iso
+  createTime: '2022-12-30T17:21:07.741Z'
+  description: Firewall rules that allow connections from all IP addresses on TCP
+    port 3389 or UDP port 3389 may expose RDP services to attackers.
+  eventTime: '2023-04-04T19:50:46.702Z'
+  externalUri: https://console.cloud.google.com/networking/firewalls/details/default-allow-rdp?project=cloudy-labz
+  findingClass: MISCONFIGURATION
+  mute: UNDEFINED
+  name: organizations/110572507568/sources/5355249297771256540/findings/cd2a095d6989c31d9088727043d5257d
+  parent: organizations/110572507568/sources/5355249297771256540
+  parentDisplayName: Security Health Analytics
+  resourceName: //compute.googleapis.com/projects/cloudy-labz/global/firewalls/5635842714453987321
+  securityMarks:
+    name: organizations/110572507568/sources/5355249297771256540/findings/cd2a095d6989c31d9088727043d5257d/securityMarks
+  severity: HIGH
+  sourceProperties:
+    ExceptionInstructions: Add the security mark "allow_open_rdp_port" to the asset
+      with a value of "true" to prevent this finding from being activated again.
+    Explanation: Firewall rules that allow connections from all IP addresses on TCP
+      port 3389 or UDP port 3389 may expose RDP services to attackers.
+    ExposedService: RDP
+    OpenPorts:
+      TCP:
+      - 3389
+      UDP:
+      - 3389
+    ReactivationCount: 0
+    Recommendation: 'Restrict the firewall rules at: https://console.cloud.google.com/networking/firewalls/details/default-allow-rdp?project=cloudy-labz'
+    ResourcePath:
+    - projects/cloudy-labz/
+    - organizations/110572507568/
+    ScannerName: FIREWALL_SCANNER
+    compliance_standards:
+      cis:
+      - ids:
+        - '3.7'
+        version: '1.0'
+      - ids:
+        - '3.7'
+        version: '1.1'
+      - ids:
+        - '3.7'
+        version: '1.2'
+      - ids:
+        - '3.7'
+        version: '1.3'
+      iso:
+      - ids:
+        - A.13.1.1
+      nist:
+      - ids:
+        - SC-7
+      pci:
+      - ids:
+        - 1.2.1
+  state: ACTIVE
+resource:
+  displayName: default-allow-rdp
+  name: //compute.googleapis.com/projects/cloudy-labz/global/firewalls/5635842714453987321
+  parentDisplayName: cloudy-labz
+  parentName: //cloudresourcemanager.googleapis.com/projects/865303606864
+  projectDisplayName: cloudy-labz
+  projectName: //cloudresourcemanager.googleapis.com/projects/865303606864
+  type: google.compute.Firewall

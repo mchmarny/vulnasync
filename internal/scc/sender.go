@@ -31,7 +31,7 @@ func Sender(ctx context.Context, occ *ca.Occurrence) error {
 	}
 
 	f, err := c.CreateFinding(ctx, &pb.CreateFindingRequest{
-		Parent:    occ.ResourceUri,
+		Parent:    "organizations/[organization_id]/sources/[source_id]",
 		FindingId: occ.Name,
 		Finding: &pb.Finding{
 			Name:         occ.Name,
@@ -59,14 +59,4 @@ func Sender(ctx context.Context, occ *ca.Occurrence) error {
 	log.Printf("Created finding: %s", f.CanonicalName)
 
 	return nil
-}
-
-func get(ctx context.Context) (*ca.Occurrence, error) {
-	c, err := scc.NewClient(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create SCC client")
-	}
-	defer c.Close()
-
-	return nil, nil
 }

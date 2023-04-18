@@ -1,5 +1,5 @@
 VERSION    :=$(shell cat .version)
-YAML_FILES :=$(shell find . ! -path "./vendor/*" ! -path "./deploy/*" ! -path "./setup/*" -type f -regex ".*y*ml" -print)
+YAML_FILES :=$(shell find . ! -path "./vendor/*" ! -path "./setup/*" -type f -regex ".*y*ml" -print)
 
 all: help
 
@@ -37,7 +37,6 @@ lint-yaml: ## Runs yamllint on all yaml files (brew install yamllint)
 .PHONY: lint-tf
 lint-tf: ## Runs terraform fmt on all terraform files
 	terraform -chdir=./setup fmt
-	terraform -chdir=./deploy fmt
 
 .PHONY: build
 build: tidy ## Builds CLI binary

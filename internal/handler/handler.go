@@ -7,7 +7,7 @@ import (
 
 	"github.com/mchmarny/vulnasync/internal/aa"
 	"github.com/mchmarny/vulnasync/internal/pubsub"
-	"github.com/mchmarny/vulnasync/internal/sender/stdout"
+	"github.com/mchmarny/vulnasync/internal/scc"
 	"github.com/rs/zerolog/log"
 	ca "google.golang.org/api/containeranalysis/v1"
 )
@@ -18,8 +18,14 @@ const (
 
 var (
 	// default occurrence sender
-	sender OccurrenceSender = stdout.Sender
+	sender OccurrenceSender = scc.Sender
+
+	// default occurrence provider
+	provider OccurrenceProvider = aa.GetOccurrence
 )
+
+// OccurrenceProvider is a function that gets an occurrence by name.
+type OccurrenceProvider func(ctx context.Context, name string) (*ca.Occurrence, error)
 
 // OccurrenceSender is a function that sends an occurrence to a specific.
 type OccurrenceSender func(ctx context.Context, occ *ca.Occurrence) error
@@ -50,7 +56,7 @@ func Process(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	occ, err := aa.GetOccurrence(r.Context(), v.Name)
+	occ, err := provider(r.Context(), v.Name)
 	if err != nil {
 		log.Printf("error while getting occurrence: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
