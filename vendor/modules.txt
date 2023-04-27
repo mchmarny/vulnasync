@@ -15,7 +15,7 @@ cloud.google.com/go/iam/apiv1/iampb
 cloud.google.com/go/longrunning
 cloud.google.com/go/longrunning/autogen
 cloud.google.com/go/longrunning/autogen/longrunningpb
-# cloud.google.com/go/securitycenter v1.19.0
+# cloud.google.com/go/securitycenter v1.20.0
 ## explicit; go 1.19
 cloud.google.com/go/securitycenter/apiv1
 cloud.google.com/go/securitycenter/apiv1/securitycenterpb
