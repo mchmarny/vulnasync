@@ -1,6 +1,6 @@
 # vulnasync
 
-Pushes vulnerabilities found by Artifact Analyses into Security Command Center. 
+WIP: Pushes vulnerabilities found by Artifact Analyses into Security Command Center. 
 
 ## Requirements 
 
