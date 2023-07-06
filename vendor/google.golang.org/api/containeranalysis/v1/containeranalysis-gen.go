@@ -142,7 +142,6 @@ func NewProjectsService(s *Service) *ProjectsService {
 	rs := &ProjectsService{s: s}
 	rs.Notes = NewProjectsNotesService(s)
 	rs.Occurrences = NewProjectsOccurrencesService(s)
-	rs.Resources = NewProjectsResourcesService(s)
 	return rs
 }
 
@@ -152,8 +151,6 @@ type ProjectsService struct {
 	Notes *ProjectsNotesService
 
 	Occurrences *ProjectsOccurrencesService
-
-	Resources *ProjectsResourcesService
 }
 
 func NewProjectsNotesService(s *Service) *ProjectsNotesService {
@@ -183,15 +180,6 @@ func NewProjectsOccurrencesService(s *Service) *ProjectsOccurrencesService {
 }
 
 type ProjectsOccurrencesService struct {
-	s *Service
-}
-
-func NewProjectsResourcesService(s *Service) *ProjectsResourcesService {
-	rs := &ProjectsResourcesService{s: s}
-	return rs
-}
-
-type ProjectsResourcesService struct {
 	s *Service
 }
 
@@ -994,6 +982,7 @@ type CVSS struct {
 	//   "ATTACK_COMPLEXITY_UNSPECIFIED"
 	//   "ATTACK_COMPLEXITY_LOW"
 	//   "ATTACK_COMPLEXITY_HIGH"
+	//   "ATTACK_COMPLEXITY_MEDIUM"
 	AttackComplexity string `json:"attackComplexity,omitempty"`
 
 	// AttackVector: Base Metrics Represents the intrinsic characteristics
@@ -1020,6 +1009,8 @@ type CVSS struct {
 	//   "IMPACT_HIGH"
 	//   "IMPACT_LOW"
 	//   "IMPACT_NONE"
+	//   "IMPACT_PARTIAL"
+	//   "IMPACT_COMPLETE"
 	AvailabilityImpact string `json:"availabilityImpact,omitempty"`
 
 	// BaseScore: The base score is a function of the base metric scores.
@@ -1030,6 +1021,8 @@ type CVSS struct {
 	//   "IMPACT_HIGH"
 	//   "IMPACT_LOW"
 	//   "IMPACT_NONE"
+	//   "IMPACT_PARTIAL"
+	//   "IMPACT_COMPLETE"
 	ConfidentialityImpact string `json:"confidentialityImpact,omitempty"`
 
 	ExploitabilityScore float64 `json:"exploitabilityScore,omitempty"`
@@ -1041,6 +1034,8 @@ type CVSS struct {
 	//   "IMPACT_HIGH"
 	//   "IMPACT_LOW"
 	//   "IMPACT_NONE"
+	//   "IMPACT_PARTIAL"
+	//   "IMPACT_COMPLETE"
 	IntegrityImpact string `json:"integrityImpact,omitempty"`
 
 	// Possible values:
@@ -1628,6 +1623,13 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1Artifacts struct {
 	// is marked FAILURE.
 	MavenArtifacts []*ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact `json:"mavenArtifacts,omitempty"`
 
+	// NpmPackages: A list of npm packages to be uploaded to Artifact
+	// Registry upon successful completion of all build steps. Npm packages
+	// in the specified paths will be uploaded to the specified Artifact
+	// Registry repository using the builder service account's credentials.
+	// If any packages fail to be pushed, the build is marked FAILURE.
+	NpmPackages []*ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsNpmPackage `json:"npmPackages,omitempty"`
+
 	// Objects: A list of objects to be uploaded to Cloud Storage upon
 	// successful completion of all build steps. Files in the workspace
 	// matching specified paths globs will be uploaded to the specified
@@ -1758,6 +1760,42 @@ func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsMavenArtifact) Mars
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsNpmPackage: Npm
+// package to upload to Artifact Registry upon successful completion of
+// all build steps.
+type ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsNpmPackage struct {
+	// PackagePath: Path to the package.json. e.g. workspace/path/to/package
+	PackagePath string `json:"packagePath,omitempty"`
+
+	// Repository: Artifact Registry repository, in the form
+	// "https://$REGION-npm.pkg.dev/$PROJECT/$REPOSITORY" Npm package in the
+	// workspace specified by path will be zipped and uploaded to Artifact
+	// Registry with this location as a prefix.
+	Repository string `json:"repository,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "PackagePath") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "PackagePath") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsNpmPackage) MarshalJSON() ([]byte, error) {
+	type NoMethod ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsNpmPackage
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // ContaineranalysisGoogleDevtoolsCloudbuildV1ArtifactsPythonPackage:
 // Python package to upload to Artifact Registry upon successful
 // completion of all build steps. A package can encapsulate multiple
@@ -1854,8 +1892,8 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1Build struct {
 	// Console.
 	LogUrl string `json:"logUrl,omitempty"`
 
-	// LogsBucket: Google Cloud Storage bucket where logs should be written
-	// (see Bucket Name Requirements
+	// LogsBucket: Cloud Storage bucket where logs should be written (see
+	// Bucket Name Requirements
 	// (https://cloud.google.com/storage/docs/bucket-naming#requirements)).
 	// Logs file names will be of the format
 	// `${logs_bucket}/log-${build_id}.txt`.
@@ -2098,15 +2136,14 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions struct {
 	Env []string `json:"env,omitempty"`
 
 	// LogStreamingOption: Option to define build log streaming behavior to
-	// Google Cloud Storage.
+	// Cloud Storage.
 	//
 	// Possible values:
 	//   "STREAM_DEFAULT" - Service may automatically determine build log
 	// streaming behavior.
-	//   "STREAM_ON" - Build logs should be streamed to Google Cloud
-	// Storage.
-	//   "STREAM_OFF" - Build logs should not be streamed to Google Cloud
-	// Storage; they will be written when the build is completed.
+	//   "STREAM_ON" - Build logs should be streamed to Cloud Storage.
+	//   "STREAM_OFF" - Build logs should not be streamed to Cloud Storage;
+	// they will be written when the build is completed.
 	LogStreamingOption string `json:"logStreamingOption,omitempty"`
 
 	// Logging: Option to specify the logging mode, which determines if and
@@ -2134,6 +2171,7 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions struct {
 	//   "N1_HIGHCPU_32" - Highcpu machine with 32 CPUs.
 	//   "E2_HIGHCPU_8" - Highcpu e2 machine with 8 CPUs.
 	//   "E2_HIGHCPU_32" - Highcpu e2 machine with 32 CPUs.
+	//   "E2_MEDIUM" - E2 machine with 1 CPU.
 	MachineType string `json:"machineType,omitempty"`
 
 	// Pool: Optional. Specification for execution on a `WorkerPool`. See
@@ -2161,6 +2199,7 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions struct {
 	//   "NONE" - No hash requested.
 	//   "SHA256" - Use a sha256 hash.
 	//   "MD5" - Use a md5 hash.
+	//   "SHA512" - Use a sha512 hash.
 	SourceProvenanceHash []string `json:"sourceProvenanceHash,omitempty"`
 
 	// SubstitutionOption: Option to specify behavior when there is an error
@@ -2498,6 +2537,51 @@ func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes) MarshalJSON() ([
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// ContaineranalysisGoogleDevtoolsCloudbuildV1GitSource: Location of the
+// source in any accessible Git repository.
+type ContaineranalysisGoogleDevtoolsCloudbuildV1GitSource struct {
+	// Dir: Directory, relative to the source root, in which to run the
+	// build. This must be a relative path. If a step's `dir` is specified
+	// and is an absolute path, this value is ignored for that step's
+	// execution.
+	Dir string `json:"dir,omitempty"`
+
+	// Revision: The revision to fetch from the Git repository such as a
+	// branch, a tag, a commit SHA, or any Git ref. Cloud Build uses `git
+	// fetch` to fetch the revision from the Git repository; therefore make
+	// sure that the string you provide for `revision` is parsable by the
+	// command. For information on string values accepted by `git fetch`,
+	// see https://git-scm.com/docs/gitrevisions#_specifying_revisions. For
+	// information on `git fetch`, see https://git-scm.com/docs/git-fetch.
+	Revision string `json:"revision,omitempty"`
+
+	// Url: Location of the Git repo to build. This will be used as a `git
+	// remote`, see https://git-scm.com/docs/git-remote.
+	Url string `json:"url,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Dir") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Dir") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1GitSource) MarshalJSON() ([]byte, error) {
+	type NoMethod ContaineranalysisGoogleDevtoolsCloudbuildV1GitSource
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // ContaineranalysisGoogleDevtoolsCloudbuildV1Hash: Container message
 // for hash values.
 type ContaineranalysisGoogleDevtoolsCloudbuildV1Hash struct {
@@ -2507,6 +2591,7 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1Hash struct {
 	//   "NONE" - No hash requested.
 	//   "SHA256" - Use a sha256 hash.
 	//   "MD5" - Use a md5 hash.
+	//   "SHA512" - Use a sha512 hash.
 	Type string `json:"type,omitempty"`
 
 	// Value: The hash value.
@@ -2664,6 +2749,10 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1Results struct {
 	// end of the build.
 	MavenArtifacts []*ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact `json:"mavenArtifacts,omitempty"`
 
+	// NpmPackages: Npm packages uploaded to Artifact Registry at the end of
+	// the build.
+	NpmPackages []*ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedNpmPackage `json:"npmPackages,omitempty"`
+
 	// NumArtifacts: Number of non-container artifacts uploaded to Cloud
 	// Storage. Only populated when artifacts are uploaded to Cloud Storage.
 	NumArtifacts int64 `json:"numArtifacts,omitempty,string"`
@@ -2808,21 +2897,23 @@ func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1Secrets) MarshalJSON() ([]by
 // ContaineranalysisGoogleDevtoolsCloudbuildV1Source: Location of the
 // source in a supported storage service.
 type ContaineranalysisGoogleDevtoolsCloudbuildV1Source struct {
+	// GitSource: If provided, get the source from this Git repository.
+	GitSource *ContaineranalysisGoogleDevtoolsCloudbuildV1GitSource `json:"gitSource,omitempty"`
+
 	// RepoSource: If provided, get the source from this location in a Cloud
 	// Source Repository.
 	RepoSource *ContaineranalysisGoogleDevtoolsCloudbuildV1RepoSource `json:"repoSource,omitempty"`
 
 	// StorageSource: If provided, get the source from this location in
-	// Google Cloud Storage.
+	// Cloud Storage.
 	StorageSource *ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSource `json:"storageSource,omitempty"`
 
 	// StorageSourceManifest: If provided, get the source from this manifest
-	// in Google Cloud Storage. This feature is in Preview; see description
-	// here
+	// in Cloud Storage. This feature is in Preview; see description here
 	// (https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
 	StorageSourceManifest *ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSourceManifest `json:"storageSourceManifest,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "RepoSource") to
+	// ForceSendFields is a list of field names (e.g. "GitSource") to
 	// unconditionally include in API requests. By default, fields with
 	// empty or default values are omitted from API requests. However, any
 	// non-pointer, non-interface field appearing in ForceSendFields will be
@@ -2830,7 +2921,7 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1Source struct {
 	// This may be used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "RepoSource") to include in
+	// NullFields is a list of field names (e.g. "GitSource") to include in
 	// API requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
@@ -2896,20 +2987,20 @@ func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1SourceProvenance) MarshalJSO
 }
 
 // ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSource: Location of
-// the source in an archive file in Google Cloud Storage.
+// the source in an archive file in Cloud Storage.
 type ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSource struct {
-	// Bucket: Google Cloud Storage bucket containing the source (see Bucket
-	// Name Requirements
+	// Bucket: Cloud Storage bucket containing the source (see Bucket Name
+	// Requirements
 	// (https://cloud.google.com/storage/docs/bucket-naming#requirements)).
 	Bucket string `json:"bucket,omitempty"`
 
-	// Generation: Google Cloud Storage generation for the object. If the
+	// Generation: Cloud Storage generation for the object. If the
 	// generation is omitted, the latest generation will be used.
 	Generation int64 `json:"generation,omitempty,string"`
 
-	// Object: Google Cloud Storage object containing the source. This
-	// object must be a zipped (`.zip`) or gzipped archive file (`.tar.gz`)
-	// containing source to build.
+	// Object: Cloud Storage object containing the source. This object must
+	// be a zipped (`.zip`) or gzipped archive file (`.tar.gz`) containing
+	// source to build.
 	Object string `json:"object,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Bucket") to
@@ -2936,21 +3027,21 @@ func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSource) MarshalJSON()
 }
 
 // ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSourceManifest:
-// Location of the source manifest in Google Cloud Storage. This feature
-// is in Preview; see description here
+// Location of the source manifest in Cloud Storage. This feature is in
+// Preview; see description here
 // (https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcs-fetcher).
 type ContaineranalysisGoogleDevtoolsCloudbuildV1StorageSourceManifest struct {
-	// Bucket: Google Cloud Storage bucket containing the source manifest
-	// (see Bucket Name Requirements
+	// Bucket: Cloud Storage bucket containing the source manifest (see
+	// Bucket Name Requirements
 	// (https://cloud.google.com/storage/docs/bucket-naming#requirements)).
 	Bucket string `json:"bucket,omitempty"`
 
-	// Generation: Google Cloud Storage generation for the object. If the
+	// Generation: Cloud Storage generation for the object. If the
 	// generation is omitted, the latest generation will be used.
 	Generation int64 `json:"generation,omitempty,string"`
 
-	// Object: Google Cloud Storage object containing the source manifest.
-	// This object must be a JSON file.
+	// Object: Cloud Storage object containing the source manifest. This
+	// object must be a JSON file.
 	Object string `json:"object,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Bucket") to
@@ -3040,6 +3131,42 @@ type ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact struct {
 
 func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact) MarshalJSON() ([]byte, error) {
 	type NoMethod ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedMavenArtifact
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedNpmPackage: An npm
+// package uploaded to Artifact Registry using the NpmPackage directive.
+type ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedNpmPackage struct {
+	// FileHashes: Hash types and values of the npm package.
+	FileHashes *ContaineranalysisGoogleDevtoolsCloudbuildV1FileHashes `json:"fileHashes,omitempty"`
+
+	// PushTiming: Output only. Stores timing information for pushing the
+	// specified artifact.
+	PushTiming *ContaineranalysisGoogleDevtoolsCloudbuildV1TimeSpan `json:"pushTiming,omitempty"`
+
+	// Uri: URI of the uploaded npm package.
+	Uri string `json:"uri,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "FileHashes") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "FileHashes") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedNpmPackage) MarshalJSON() ([]byte, error) {
+	type NoMethod ContaineranalysisGoogleDevtoolsCloudbuildV1UploadedNpmPackage
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3447,6 +3574,7 @@ type DiscoveryNote struct {
 	//   "DSSE_ATTESTATION" - This represents a DSSE attestation Note
 	//   "VULNERABILITY_ASSESSMENT" - This represents a Vulnerability
 	// Assessment.
+	//   "SBOM_REFERENCE" - This represents an SBOM Reference.
 	AnalysisKind string `json:"analysisKind,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AnalysisKind") to
@@ -3844,12 +3972,6 @@ func (s *FixableTotalByDigest) MarshalJSON() ([]byte, error) {
 	type NoMethod FixableTotalByDigest
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GeneratePackagesSummaryRequest: GeneratePackagesSummaryRequest is the
-// request body for the GeneratePackagesSummary API method. It just
-// takes a single name argument, referring to the resource.
-type GeneratePackagesSummaryRequest struct {
 }
 
 // GerritSourceContext: A SourceContext referring to a Gerrit project.
@@ -4694,40 +4816,6 @@ func (s *License) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// LicensesSummary: Per license count
-type LicensesSummary struct {
-	// Count: The number of fixable vulnerabilities associated with this
-	// resource.
-	Count int64 `json:"count,omitempty,string"`
-
-	// License: The license of the package. Note that the format of this
-	// value is not guaranteed. It may be nil, an empty string, a boolean
-	// value (A | B), a differently formed boolean value (A OR B), etc...
-	License string `json:"license,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Count") to
-	// unconditionally include in API requests. By default, fields with
-	// empty or default values are omitted from API requests. However, any
-	// non-pointer, non-interface field appearing in ForceSendFields will be
-	// sent to the server regardless of whether the field is empty or not.
-	// This may be used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Count") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *LicensesSummary) MarshalJSON() ([]byte, error) {
-	type NoMethod LicensesSummary
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
 // ListNoteOccurrencesResponse: Response for listing occurrences for a
 // note.
 type ListNoteOccurrencesResponse struct {
@@ -5040,6 +5128,7 @@ type Note struct {
 	//   "DSSE_ATTESTATION" - This represents a DSSE attestation Note
 	//   "VULNERABILITY_ASSESSMENT" - This represents a Vulnerability
 	// Assessment.
+	//   "SBOM_REFERENCE" - This represents an SBOM Reference.
 	Kind string `json:"kind,omitempty"`
 
 	// LongDescription: A detailed description of this note.
@@ -5058,6 +5147,9 @@ type Note struct {
 
 	// RelatedUrl: URLs associated with this note.
 	RelatedUrl []*RelatedUrl `json:"relatedUrl,omitempty"`
+
+	// SbomReference: A note describing an SBOM reference.
+	SbomReference *SBOMReferenceNote `json:"sbomReference,omitempty"`
 
 	// ShortDescription: A one sentence description of this note.
 	ShortDescription string `json:"shortDescription,omitempty"`
@@ -5156,6 +5248,7 @@ type Occurrence struct {
 	//   "DSSE_ATTESTATION" - This represents a DSSE attestation Note
 	//   "VULNERABILITY_ASSESSMENT" - This represents a Vulnerability
 	// Assessment.
+	//   "SBOM_REFERENCE" - This represents an SBOM Reference.
 	Kind string `json:"kind,omitempty"`
 
 	// Name: Output only. The name of the occurrence in the form of
@@ -5179,6 +5272,9 @@ type Occurrence struct {
 	// for which the occurrence applies. For example,
 	// `https://gcr.io/project/image@sha256:123abc` for a Docker image.
 	ResourceUri string `json:"resourceUri,omitempty"`
+
+	// SbomReference: Describes a specific SBOM reference occurrences.
+	SbomReference *SBOMReferenceOccurrence `json:"sbomReference,omitempty"`
 
 	// UpdateTime: Output only. The time this occurrence was last updated.
 	UpdateTime string `json:"updateTime,omitempty"`
@@ -5422,45 +5518,6 @@ type PackageOccurrence struct {
 
 func (s *PackageOccurrence) MarshalJSON() ([]byte, error) {
 	type NoMethod PackageOccurrence
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// PackagesSummaryResponse: A summary of the packages found within the
-// given resource.
-type PackagesSummaryResponse struct {
-	// LicensesSummary: A listing by license name of each of the licenses
-	// and their counts.
-	LicensesSummary []*LicensesSummary `json:"licensesSummary,omitempty"`
-
-	// ResourceUrl: The unique URL of the image or the container for which
-	// this summary applies.
-	ResourceUrl string `json:"resourceUrl,omitempty"`
-
-	// ServerResponse contains the HTTP response code and headers from the
-	// server.
-	googleapi.ServerResponse `json:"-"`
-
-	// ForceSendFields is a list of field names (e.g. "LicensesSummary") to
-	// unconditionally include in API requests. By default, fields with
-	// empty or default values are omitted from API requests. However, any
-	// non-pointer, non-interface field appearing in ForceSendFields will be
-	// sent to the server regardless of whether the field is empty or not.
-	// This may be used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "LicensesSummary") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *PackagesSummaryResponse) MarshalJSON() ([]byte, error) {
-	type NoMethod PackagesSummaryResponse
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -5847,6 +5904,161 @@ type RepoId struct {
 
 func (s *RepoId) MarshalJSON() ([]byte, error) {
 	type NoMethod RepoId
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SBOMReferenceNote: The note representing an SBOM reference.
+type SBOMReferenceNote struct {
+	// Format: The format that SBOM takes. E.g. may be spdx, cyclonedx,
+	// etc...
+	Format string `json:"format,omitempty"`
+
+	// Version: The version of the format that the SBOM takes. E.g. if the
+	// format is spdx, the version may be 2.3.
+	Version string `json:"version,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Format") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Format") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SBOMReferenceNote) MarshalJSON() ([]byte, error) {
+	type NoMethod SBOMReferenceNote
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SBOMReferenceOccurrence: The occurrence representing an SBOM
+// reference as applied to a specific resource. The occurrence follows
+// the DSSE specification. See
+// https://github.com/secure-systems-lab/dsse/blob/master/envelope.md
+// for more details.
+type SBOMReferenceOccurrence struct {
+	// Payload: The actual payload that contains the SBOM reference data.
+	Payload *SbomReferenceIntotoPayload `json:"payload,omitempty"`
+
+	// PayloadType: The kind of payload that SbomReferenceIntotoPayload
+	// takes. Since it's in the intoto format, this value is expected to be
+	// 'application/vnd.in-toto+json'.
+	PayloadType string `json:"payloadType,omitempty"`
+
+	// Signatures: The signatures over the payload.
+	Signatures []*EnvelopeSignature `json:"signatures,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Payload") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Payload") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SBOMReferenceOccurrence) MarshalJSON() ([]byte, error) {
+	type NoMethod SBOMReferenceOccurrence
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SbomReferenceIntotoPayload: The actual payload that contains the SBOM
+// Reference data. The payload follows the intoto statement
+// specification. See
+// https://github.com/in-toto/attestation/blob/main/spec/v1.0/statement.md
+// for more details.
+type SbomReferenceIntotoPayload struct {
+	// Type: Identifier for the schema of the Statement.
+	Type string `json:"_type,omitempty"`
+
+	// Predicate: Additional parameters of the Predicate. Includes the
+	// actual data about the SBOM.
+	Predicate *SbomReferenceIntotoPredicate `json:"predicate,omitempty"`
+
+	// PredicateType: URI identifying the type of the Predicate.
+	PredicateType string `json:"predicateType,omitempty"`
+
+	// Subject: Set of software artifacts that the attestation applies to.
+	// Each element represents a single software artifact.
+	Subject []*Subject `json:"subject,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Type") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Type") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SbomReferenceIntotoPayload) MarshalJSON() ([]byte, error) {
+	type NoMethod SbomReferenceIntotoPayload
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// SbomReferenceIntotoPredicate: A predicate which describes the SBOM
+// being referenced.
+type SbomReferenceIntotoPredicate struct {
+	// Digest: A map of algorithm to digest of the contents of the SBOM.
+	Digest map[string]string `json:"digest,omitempty"`
+
+	// Location: The location of the SBOM.
+	Location string `json:"location,omitempty"`
+
+	// MimeType: The mime type of the SBOM.
+	MimeType string `json:"mimeType,omitempty"`
+
+	// ReferrerId: The person or system referring this predicate to the
+	// consumer.
+	ReferrerId string `json:"referrerId,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Digest") to
+	// unconditionally include in API requests. By default, fields with
+	// empty or default values are omitted from API requests. However, any
+	// non-pointer, non-interface field appearing in ForceSendFields will be
+	// sent to the server regardless of whether the field is empty or not.
+	// This may be used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Digest") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *SbomReferenceIntotoPredicate) MarshalJSON() ([]byte, error) {
+	type NoMethod SbomReferenceIntotoPredicate
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -10409,150 +10621,6 @@ func (c *ProjectsOccurrencesTestIamPermissionsCall) Do(opts ...googleapi.CallOpt
 	//   },
 	//   "response": {
 	//     "$ref": "TestIamPermissionsResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "containeranalysis.projects.resources.generatePackagesSummary":
-
-type ProjectsResourcesGeneratePackagesSummaryCall struct {
-	s                              *Service
-	name                           string
-	generatepackagessummaryrequest *GeneratePackagesSummaryRequest
-	urlParams_                     gensupport.URLParams
-	ctx_                           context.Context
-	header_                        http.Header
-}
-
-// GeneratePackagesSummary: Gets a summary of the packages within a
-// given resource.
-//
-//   - name: The name of the resource to get a packages summary for in the
-//     form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.
-func (r *ProjectsResourcesService) GeneratePackagesSummary(name string, generatepackagessummaryrequest *GeneratePackagesSummaryRequest) *ProjectsResourcesGeneratePackagesSummaryCall {
-	c := &ProjectsResourcesGeneratePackagesSummaryCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.name = name
-	c.generatepackagessummaryrequest = generatepackagessummaryrequest
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *ProjectsResourcesGeneratePackagesSummaryCall) Fields(s ...googleapi.Field) *ProjectsResourcesGeneratePackagesSummaryCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *ProjectsResourcesGeneratePackagesSummaryCall) Context(ctx context.Context) *ProjectsResourcesGeneratePackagesSummaryCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *ProjectsResourcesGeneratePackagesSummaryCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *ProjectsResourcesGeneratePackagesSummaryCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	reqHeaders.Set("x-goog-api-client", "gl-go/"+gensupport.GoVersion()+" gdcl/"+internal.Version)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	var body io.Reader = nil
-	body, err := googleapi.WithoutDataWrapper.JSONReader(c.generatepackagessummaryrequest)
-	if err != nil {
-		return nil, err
-	}
-	reqHeaders.Set("Content-Type", "application/json")
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+name}:generatePackagesSummary")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("POST", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"name": c.name,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "containeranalysis.projects.resources.generatePackagesSummary" call.
-// Exactly one of *PackagesSummaryResponse or error will be non-nil. Any
-// non-2xx status code is an error. Response headers are in either
-// *PackagesSummaryResponse.ServerResponse.Header or (if a response was
-// returned at all) in error.(*googleapi.Error).Header. Use
-// googleapi.IsNotModified to check whether the returned error was
-// because http.StatusNotModified was returned.
-func (c *ProjectsResourcesGeneratePackagesSummaryCall) Do(opts ...googleapi.CallOption) (*PackagesSummaryResponse, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, gensupport.WrapError(&googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		})
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, gensupport.WrapError(err)
-	}
-	ret := &PackagesSummaryResponse{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Gets a summary of the packages within a given resource.",
-	//   "flatPath": "v1/projects/{projectsId}/resources/{resourcesId}:generatePackagesSummary",
-	//   "httpMethod": "POST",
-	//   "id": "containeranalysis.projects.resources.generatePackagesSummary",
-	//   "parameterOrder": [
-	//     "name"
-	//   ],
-	//   "parameters": {
-	//     "name": {
-	//       "description": "Required. The name of the resource to get a packages summary for in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.",
-	//       "location": "path",
-	//       "pattern": "^projects/[^/]+/resources/.*$",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1/{+name}:generatePackagesSummary",
-	//   "request": {
-	//     "$ref": "GeneratePackagesSummaryRequest"
-	//   },
-	//   "response": {
-	//     "$ref": "PackagesSummaryResponse"
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-platform"
