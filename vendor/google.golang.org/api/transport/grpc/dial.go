@@ -35,9 +35,6 @@ const disableDirectPath = "GOOGLE_CLOUD_DISABLE_DIRECT_PATH"
 // Check env to decide if using google-c2p resolver for DirectPath traffic.
 const enableDirectPathXds = "GOOGLE_CLOUD_ENABLE_DIRECT_PATH_XDS"
 
-// Set at init time by dial_appengine.go. If nil, we're not on App Engine.
-var appengineDialerHook func(context.Context) grpc.DialOption
-
 // Set at init time by dial_socketopt.go. If nil, socketopt is not supported.
 var timeoutDialerOption grpc.DialOption
 
@@ -164,7 +161,7 @@ func dial(ctx context.Context, insecure bool, o *internal.DialSettings) (*grpc.C
 				grpcOpts = append(grpcOpts, timeoutDialerOption)
 			}
 			// Check if google-c2p resolver is enabled for DirectPath
-			if strings.EqualFold(os.Getenv(enableDirectPathXds), "true") {
+			if isDirectPathXdsUsed(o) {
 				// google-c2p resolver target must not have a port number
 				if addr, _, err := net.SplitHostPort(endpoint); err == nil {
 					endpoint = "google-c2p:///" + addr
@@ -184,12 +181,6 @@ func dial(ctx context.Context, insecure bool, o *internal.DialSettings) (*grpc.C
 			}
 			// TODO(cbro): add support for system parameters (quota project, request reason) via chained interceptor.
 		}
-	}
-
-	if appengineDialerHook != nil {
-		// Use the Socket API on App Engine.
-		// appengine dialer will override socketopt dialer
-		grpcOpts = append(grpcOpts, appengineDialerHook(ctx))
 	}
 
 	// Add tracing, but before the other options, so that clients can override the
@@ -249,6 +240,19 @@ func isDirectPathEnabled(endpoint string, o *internal.DialSettings) bool {
 		return false
 	}
 	return true
+}
+
+func isDirectPathXdsUsed(o *internal.DialSettings) bool {
+	// Method 1: Enable DirectPath xDS by env;
+	if strings.EqualFold(os.Getenv(enableDirectPathXds), "true") {
+		return true
+	}
+	// Method 2: Enable DirectPath xDS by option;
+	if o.EnableDirectPathXds {
+		return true
+	}
+	return false
+
 }
 
 func isTokenSourceDirectPathCompatible(ts oauth2.TokenSource, o *internal.DialSettings) bool {
