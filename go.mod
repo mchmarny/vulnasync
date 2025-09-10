@@ -1,6 +1,6 @@
 module github.com/mchmarny/vulnasync
 
-go 1.20
+go 1.23
 
 require (
 	cloud.google.com/go/securitycenter v1.19.0
@@ -8,7 +8,7 @@ require (
 	github.com/rs/zerolog v1.29.1
 	github.com/stretchr/testify v1.8.2
 	google.golang.org/api v0.118.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
